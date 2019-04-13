@@ -1,129 +1,77 @@
 import Sun from './Sun';
 import Planet from './Planet';
-
-const PLANETS = [
-  {
-    name: 'Mercury',
-    radius: 50,
-    speed: 1,
-    color: '#ffaaaa',
-    rads: 0,
-    info: 'Some cool stuff here',
-    size: 4,
-    period: 88.0,
-    diameter: 3031.9
-  },
-  {
-    name: 'Venus',
-    radius: 70,
-    speed: 1,
-    color: '#ffffaa',
-    rads: 0,
-    info: 'Some cool stuff here',
-    size: 3,
-    period: 224.7,
-    diameter: 7520.8
-  },
-  {
-    name: 'Earth',
-    radius: 90,
-    speed: 1,
-    color: '#aaaaff',
-    rads: 0,
-    info: 'Some cool stuff here',
-    size: 5,
-    period: 365.2,
-    diameter: 7917.5
-  },
-  {
-    name: 'Mars',
-    radius: 110,
-    speed: 1,
-    color: '#ff9999',
-    rads: 0,
-    info: 'Some cool stuff here',
-    size: 4,
-    period: 687.0,
-    diameter: 4212.3
-  },
-  {
-    name: 'Jupiter',
-    radius: 130,
-    speed: 1,
-    color: '#ff99ff',
-    rads: 0,
-    info: 'Some cool stuff here',
-    size: 6,
-    period: 4331.0,
-    diameter: 86881
-  },
-  {
-    name: 'Saturn',
-    radius: 150,
-    speed: 1,
-    color: '#ffff99',
-    rads: 0,
-    info: 'Some cool stuff here',
-    size: 6,
-    period: 10747.0,
-    diameter: 72367
-  },
-  {
-    name: 'Uranus',
-    radius: 170,
-    speed: 1,
-    color: '#ff99ff',
-    rads: 0,
-    info: 'Some cool stuff here',
-    size: 5,
-    period: 30589.0,
-    diameter: 31518
-  },
-  {
-    name: 'Neptune',
-    radius: 190,
-    speed: 1,
-    color: '#9999ff',
-    rads: 0,
-    info: 'Some cool stuff here',
-    size: 5,
-    period: 59800.0,
-    diameter: 30599
-  }
-]
+import DayCounter from './DayCounter';
+import InfoBox from './InfoBox';
+import { PLANETS } from './constants';
+import { pythagorean } from './utils';
 
 export default class Game {
     constructor(config) {
       this.container = config.container || document.querySelector('body');
       this.framecount = 0;
       this.day = 0;
+      this.planets = [];
+      this.cursorDistanceFromCenter = 0;
     }
 
     init() {
-      this.board = document.createElement('canvas');
       this.height = 700;
       this.width = 700;
-      this.board.height = this.height;
-      this.board.width = this.width;
       this.center = {
         x: this.width / 2,
         y: this.height / 2
       };
+      this._buildElements();
       this.ctx = this.board.getContext('2d');
-      this.container.appendChild(this.board);
       this.ctx.fillStyle = 'black';
       this.ctx.fillRect(0, 0, 700, 700);
-      this.planets = [];
       this.populatePlanets();
       this.sun = new Sun({ game: this });
       this.sun.init();
+      this.dayCounter = new DayCounter({
+        container: this.container,
+        parent: this
+      });
+      this.dayCounter.init();
+      this.infoBox = new InfoBox({
+        container: this.container,
+        parent: this
+      });
+      this.infoBox.init();
+      this._setupListeners();
       this.step();
+    }
+
+    setActivePlanet(planet) {
+      this.infoBox.updatePlanet({
+        name: planet.name,
+        info: planet.info
+      });
+    }
+
+    _buildElements() {
+      this.board = document.createElement('canvas');
+      this.board.height = this.height;
+      this.board.width = this.width;
+      this.container.appendChild(this.board);
+    }
+
+    _setupListeners() {
+      this.board.addEventListener('mousemove', (e) => {
+        const bounds = this.board.getBoundingClientRect();
+        const posX = e.clientX - bounds.left;
+        const posY = e.clientY - bounds.top;
+
+
+        this.cursorDistanceFromCenter = pythagorean(this.center.x - posX, this.center.y - posY);
+      });
     }
 
     step() {
       debugger;
       this.framecount += 1;
       this.day += 1;
+      this.dayCounter.incrementDay();
       this.update(this.day);
       this.draw();
       
@@ -143,7 +91,11 @@ export default class Game {
       this.sun.draw();
 
       this.planets.forEach((planet) => {
-        planet.draw();
+        planet.drawOrbitPath();
+      });
+
+      this.planets.forEach((planet) => {
+        planet.drawPlanet();
       });
     }
 

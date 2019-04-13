@@ -7,3 +7,7 @@ export function radsToCartesian(rads, radius, center) {
     y: y + center.y
   }
 }
+
+export function pythagorean(x, y) {
+  return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+}
