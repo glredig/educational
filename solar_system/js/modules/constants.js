@@ -1,0 +1,1 @@
+export const PLANET_SIZE_MULTIPLIER = .0005;
