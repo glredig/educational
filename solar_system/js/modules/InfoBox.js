@@ -16,7 +16,9 @@ export default class InfoBox {
     }
 
     this.planetName.innerText = planet.name;
-    this.planetInfo.innerText = planet.info;
+    this.orbitInfo.innerHTML = `<strong>Orbit:</strong> ${planet.info.orbit} days`;
+    this.dayInfo.innerHTML = `<strong>Day:</strong> ${planet.info.day} days`;
+    this.diameterInfo.innerHTML = `<strong>Diameter:</strong> ${planet.info.diameter} miles`;
     this.infoContainer.style.display = 'block';
   }
 
@@ -34,10 +36,23 @@ export default class InfoBox {
     this.infoContainer.style.bottom = '1em';
 
     this.planetName = document.createElement('h2');
+    this.planetName.style.textAlign = 'center';
     this.infoContainer.appendChild(this.planetName);
 
     this.planetInfo = document.createElement('article');
     this.infoContainer.appendChild(this.planetInfo);
+
+    this.orbitInfo = document.createElement('span');
+    this.infoContainer.appendChild(this.orbitInfo);
+    this.infoContainer.appendChild(document.createElement('br'));
+
+    this.dayInfo = document.createElement('span');
+    this.infoContainer.appendChild(this.dayInfo);
+    this.infoContainer.appendChild(document.createElement('br'));
+
+    this.diameterInfo = document.createElement('span');
+    this.infoContainer.appendChild(this.diameterInfo);
+    this.infoContainer.appendChild(document.createElement('br'));
 
     this.infoContainer.style.display = 'none';
     this.container.appendChild(this.infoContainer);
